@@ -1,73 +1,93 @@
-# React + TypeScript + Vite
+# Keyword Editor Tool
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Веб-інструмент для масової обробки текстових рядків (кожен рядок — окрема фраза).
+Дозволяє виконувати типові текстові трансформації, сортування, очищення, пошук/заміни
+та працювати з великими обсягами даних (до 10 000 рядків) без втрати продуктивності.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Запуск локально
 
-## React Compiler
+### Вимоги
+- Node.js (рекомендовано 18+)
+- npm / pnpm / yarn
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Кроки
+```bash
+git clone https://github.com/leafeea/Keyword-editor-tool-react
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+npm install
+```
+
+```
+npm run dev
+```
+Проєкт буде доступний за адресою:
+http://localhost:5173
+
+## 🧠 Архітектурні рішення
+Загальна структура
+
+- App.tsx — UI та orchestration логіки
+
+- useHistory — керування undo/redo
+
+- Web Worker — важкі операції обробки тексту
+
+- operations/ — чисті функції трансформацій
+
+- enums/Operation — єдине джерело істини для операцій
+
+Архітектура побудована з акцентом на:
+
+- читабельність
+
+- масштабованість
+
+## ✨ Функціональність
+
+- Обробка тексту до 10 000 рядків
+- Трансформації регістру (uppercase, lowercase, capitalize)
+- Додавання / видалення символів (+, -, "...", [...])
+- Очищення тексту (пробіли, табуляції, спецсимволи)
+- Пошук і заміна (find / replace)
+- Сортування (A–Z / Z–A з урахуванням локалі uk)
+- Видалення дублікатів 
+- Undo / Redo
+- Імпорт / експорт .txt файлів
+- Відображення метрик (кількість рядків, порожніх, час операції)
+
+## Undo / Redo
+
+Undo / Redo реалізовані через history stack + cursor:
+
+- Кожна операція додає новий стан у історію
+- Після Undo і виконання нової операції — redo-гілка відсікається
+- Ліміт історії: 10 кроків
+- Ручний ввід тексту не дробиться на кроки:
+  - використовується draft state
+  - у історію потрапляють лише завершені дії (операції, імпорт, очистка)
+
+## 🧪 Тестування
+
+Проєкт покрито unit-тестами (Vitest):
+
+### arrayOperations
+- Сортування A–Z / Z–A з урахуванням локалі uk
+- Видалення дублікатів
+- Перевірка імутабельності (оригінальний масив не мутується)
+
+### lineOperations
+- Усі трансформації регістру
+- Додавання / видалення символів
+- Очищення пробілів, табів, спецсимволів
+- Пошук / заміна з параметрами
+- Edge-cases (відсутні параметри)
+Тести допомагають гарантувати коректність логіки незалежно від UI.
+
+## 📌 Що можна покращити
+- Підсвічування змін у результаті
+- Клавіатурні шорткати (Ctrl+Z / Ctrl+Y)
+- LocalStorage для автозбереження/чернетки 
