@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@layer components {
+  .btn-primary {
+    @apply px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition active:scale-95 text-sm;
+  }
+  .btn-secondary {
+    @apply px-3 py-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition active:scale-95 text-sm;
+  }
+  .btn-danger {
+    @apply px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition active:scale-95 text-sm;
+  }
+}
